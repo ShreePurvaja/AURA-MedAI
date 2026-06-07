@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURA MedAI - Cognitive Clinical Intelligence</title>
+    <!-- Google Fonts: Outfit (headings) & Plus Jakarta Sans (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Vector Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Vanilla CSS Custom Stylesheet -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-wrapper">
+        
+        <!-- ================= 1. LEFT SIDEBAR: DIAGNOSTICS & STATUS ================= -->
+        <aside class="sidebar-left">
+            <!-- Brand Section -->
+            <div class="brand-container">
+                <div class="brand-logo-glow">
+                    <i class="fa-solid fa-microchip-brain brand-icon"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>AURA <span>MedAI</span></h1>
+                    <p>Cognitive Diagnostics Aid</p>
+                </div>
+            </div>
+
+            <!-- System Indicators -->
+            <div class="panel-section status-section">
+                <div class="section-title">SYSTEM CONNECTION STATE</div>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="status-led led-offline" id="led-groq"></span>
+                        <div class="status-meta">
+                            <span class="status-title">Groq Inference</span>
+                            <span class="status-desc" id="lbl-groq">Offline</span>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-led led-offline" id="led-pinecone"></span>
+                        <div class="status-meta">
+                            <span class="status-title">Pinecone DB</span>
+                            <span class="status-desc" id="lbl-pinecone">Offline</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Clinical Disclaimer -->
+            <div class="disclaimer-card">
+                <div class="disclaimer-header">
+                    <i class="fa-solid fa-shield-halved disclaimer-icon"></i>
+                    <span>CLINICAL NOTICE</span>
+                </div>
+                <p>AURA MedAI provides vector-retrieved diagnostic context and informational references. It does not replace professional medical evaluations, diagnosis, or emergency protocols.</p>
+            </div>
+        </aside>
+
+        <!-- ================= 2. MAIN CENTER PANEL: CONVERSATION ================= -->
+        <main class="chat-workspace">
+            <!-- Chat Header -->
+            <header class="workspace-header">
+                <div class="header-left">
+                    <span class="badge" id="chat-mode-badge"><i class="fa-solid fa-database"></i> RAG RETRIEVAL OFFLINE</span>
+                    <h2>Active Consultation Log</h2>
+                </div>
+                <div class="header-right">
+                    <button class="action-btn" id="btn-clear" title="Clear Consultation History">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Conversation Messages -->
+            <div class="message-log" id="messages-container">
+                <!-- System Welcome Box -->
+                <div class="welcome-card">
+                    <div class="welcome-icon-wrapper">
+                        <i class="fa-solid fa-user-doctor"></i>
+                    </div>
+                    <h3>Welcome to AURA MedAI Console</h3>
+                    <p>I am connected to the clinical reference library and ready to assist you. Ask a query about pathologies, symptoms, or diagnostic criteria to fetch answers from the indexed guidelines.</p>
+                    <div class="suggested-queries">
+                        <button class="suggestion-tag">What is Acne?</button>
+                        <button class="suggestion-tag">What is Acromegaly and gigantism?</button>
+                        <button class="suggestion-tag">What is the Treatment for acne?</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Bar -->
+            <div class="input-panel">
+                <div class="input-glass-bar">
+                    <textarea id="chat-input" placeholder="Type queries (e.g. 'What is the treatment for acne?') or symptoms..." rows="1"></textarea>
+                    <button class="send-button" id="btn-send" disabled>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- ================= 3. RIGHT SIDEBAR: VITALS & CITATIONS ================= -->
+        <aside class="sidebar-right">
+            <!-- Live ECG Monitor Card -->
+            <div class="monitor-card">
+                <div class="monitor-header">
+                    <i class="fa-solid fa-heartbeat beat-icon"></i>
+                    <h3>VITAL MONITOR</h3>
+                </div>
+                <div class="monitor-body">
+                    <!-- Dynamic Sliding ECG SVG -->
+                    <div class="ecg-graph">
+                        <svg viewBox="0 0 300 100" class="ecg-svg">
+                            <defs>
+                                <linearGradient id="ecg-glow" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="rgba(0, 242, 254, 0.1)"></stop>
+                                    <stop offset="50%" stop-color="rgba(0, 242, 254, 1)"></stop>
+                                    <stop offset="100%" stop-color="rgba(0, 242, 254, 0.1)"></stop>
+                                </linearGradient>
+                            </defs>
+                            <!-- Grid Background Lines -->
+                            <g class="ecg-grid">
+                                <line x1="0" y1="20" x2="300" y2="20" />
+                                <line x1="0" y1="40" x2="300" y2="40" />
+                                <line x1="0" y1="60" x2="300" y2="60" />
+                                <line x1="0" y1="80" x2="300" y2="80" />
+                                <line x1="50" y1="0" x2="50" y2="100" />
+                                <line x1="100" y1="0" x2="100" y2="100" />
+                                <line x1="150" y1="0" x2="150" y2="100" />
+                                <line x1="200" y1="0" x2="200" y2="100" />
+                                <line x1="250" y1="0" x2="250" y2="100" />
+                            </g>
+                            <!-- Continuous ECG wave path -->
+                            <path class="ecg-line" d="M 0,50 L 30,50 L 35,45 L 40,55 L 45,50 L 70,50 L 75,20 L 80,90 L 85,50 L 110,50 L 115,45 L 120,55 L 125,50 L 150,50 L 180,50 L 185,45 L 190,55 L 195,50 L 220,50 L 225,20 L 230,90 L 235,50 L 260,50 L 265,45 L 270,55 L 275,50 L 300,50" />
+                        </svg>
+                    </div>
+                    <div class="monitor-vitals">
+                        <div class="vital-item">
+                            <span class="vital-lbl">HEART RATE</span>
+                            <div class="vital-val-group">
+                                <span class="vital-val animate-pulse">72</span>
+                                <span class="vital-unit">BPM</span>
+                            </div>
+                        </div>
+                        <div class="vital-item">
+                            <span class="vital-lbl">SYSTEM TEMP</span>
+                            <div class="vital-val-group">
+                                <span class="vital-val">36.6</span>
+                                <span class="vital-unit">°C</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Citations/References Panel -->
+            <div class="citations-panel">
+                <div class="citations-header">
+                    <i class="fa-solid fa-book-medical cite-header-icon"></i>
+                    <h3>CLINICAL SOURCES</h3>
+                </div>
+                <div class="citations-list" id="citations-container">
+                    <div class="citation-empty-state">
+                        <i class="fa-solid fa-server-dns"></i>
+                        <p>Retrieve medical guidance answers to display reference books and pages here.</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- ================= 4. DETAILED CITATION MODAL ================= -->
+    <div class="modal-overlay" id="cite-modal">
+        <div class="modal-card">
+            <button class="modal-close-btn" id="btn-close-modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="modal-card-header">
+                <span class="modal-tag" id="modal-tag">Reference File</span>
+                <h3 id="modal-title">Guideline Document Source</h3>
+            </div>
+            <div class="modal-card-body">
+                <div class="modal-text-block" id="modal-text">
+                    Excerpt text will load here dynamically...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Import -->
+    <script src="/static/app.js"></script>
+</body>
+</html>
