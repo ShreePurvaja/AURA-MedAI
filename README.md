@@ -105,3 +105,269 @@ The application will run on **`http://localhost:8080`**. Open this URL in any we
 
 ## ⚠️ Clinical Disclaimer
 AURA MedAI is an informational diagnostic aid for clinical reference purposes and should not be used as a replacement for professional medical diagnosis, treatment, or emergency clinical decisions.
+
+---
+
+## ⚙️ AWS CI/CD Deployment with GitHub Actions
+
+### 1. Login to AWS Console
+
+Sign in to your AWS account and navigate to the AWS Management Console.
+
+---
+
+### 2. Create an IAM User for Deployment
+
+Navigate to:
+
+```text
+AWS Console → IAM → Users → Create User
+```
+
+Create a dedicated IAM user (e.g., `auramed-admin`) for CI/CD deployments.
+
+#### Permissions Required
+
+Attach the following policies:
+
+* AmazonEC2ContainerRegistryFullAccess
+* AmazonEC2FullAccess
+
+#### Create Access Keys
+
+After creating the user:
+
+```text
+IAM User → Security Credentials → Create Access Key
+```
+
+Choose:
+
+```text
+Local Code
+```
+
+Save the following credentials securely:
+
+```text
+AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY
+```
+
+---
+
+### 3. Create an Amazon ECR Repository
+
+Navigate to:
+
+```text
+AWS Console → Elastic Container Registry (ECR) → Create Repository
+```
+
+Recommended Configuration:
+
+```text
+Repository Visibility : Private
+Tag Mutability        : Mutable
+Scan on Push          : Enabled
+Encryption            : AES-256
+```
+
+Example Repository:
+
+```text
+medicalbot
+```
+
+Save the repository URI:
+
+```text
+<aws-account-id>.dkr.ecr.<region>.amazonaws.com/medicalbot
+```
+
+Example:
+
+```text
+315865595366.dkr.ecr.us-east-1.amazonaws.com/medicalbot
+```
+
+---
+
+### 4. Create an EC2 Instance
+
+Launch an Ubuntu EC2 instance.
+
+Recommended:
+
+```text
+AMI          : Ubuntu
+Instance Type: t2.micro / t3.micro
+```
+
+Configure Security Group:
+
+| Type       | Port |
+| ---------- | ---- |
+| SSH        | 22   |
+| HTTP       | 80   |
+| HTTPS      | 443  |
+| Custom TCP | 8080 |
+
+---
+
+### 5. Install Docker on EC2
+
+#### Update Packages
+
+```bash
+sudo apt-get update -y
+sudo apt-get upgrade -y
+```
+
+#### Install Docker
+
+```bash
+curl -fsSL https://get.docker.com -o get-docker.sh
+
+sudo sh get-docker.sh
+```
+
+#### Configure Docker Permissions
+
+```bash
+sudo usermod -aG docker ubuntu
+
+newgrp docker
+```
+
+#### Verify Installation
+
+```bash
+docker --version
+```
+
+---
+
+### 6. Configure EC2 as a GitHub Self-Hosted Runner
+
+Navigate to:
+
+```text
+GitHub Repository
+→ Settings
+→ Actions
+→ Runners
+→ New Self-Hosted Runner
+```
+
+Choose:
+
+```text
+Linux
+```
+
+Execute all commands provided by GitHub on the EC2 instance.
+
+Start the runner:
+
+```bash
+./run.sh
+```
+
+You should see:
+
+```text
+✓ Connected to GitHub
+
+Listening for Jobs
+```
+
+---
+
+### 7. Configure GitHub Secrets
+
+Navigate to:
+
+```text
+GitHub Repository
+→ Settings
+→ Secrets and Variables
+→ Actions
+```
+
+Create the following secrets:
+
+```text
+AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY
+AWS_DEFAULT_REGION
+ECR_REPO
+PINECONE_API_KEY
+GROQ_API_KEY
+```
+
+Example:
+
+```text
+AWS_DEFAULT_REGION = us-east-1
+ECR_REPO           = medicalbot
+```
+
+---
+
+### 8. CI/CD Workflow
+
+The GitHub Actions pipeline performs the following steps automatically:
+
+1. Checkout source code from GitHub
+2. Build Docker image
+3. Push Docker image to Amazon ECR
+4. Trigger deployment on EC2 Self-Hosted Runner
+5. Pull latest image from ECR
+6. Launch updated Docker container
+7. Serve the application to end users
+
+```text
+GitHub
+   ↓
+GitHub Actions
+   ↓
+Docker Build
+   ↓
+Amazon ECR
+   ↓
+EC2 Self-Hosted Runner
+   ↓
+Docker Container
+   ↓
+Production Application
+```
+
+---
+
+### 9. Verify Deployment
+
+Check running containers:
+
+```bash
+docker ps
+```
+
+View logs:
+
+```bash
+docker logs <container_id>
+```
+
+Access the application:
+
+```text
+http://<EC2-PUBLIC-IP>:8080
+```
+
+Example:
+
+```text
+http://52.xxx.xxx.xxx:8080
+```
+
